@@ -1,0 +1,75 @@
+    <%- include('partials/header') %>
+    <main class="main">
+        <div class="application py-120">
+            <div class="container">
+                <div class="application-form">
+                    <h3>Add New Author</h3>
+                    <form action="/add-author" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input class="form-control" name="name" placeholder="Author Name" type="text"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Biography</label>
+                                    <textarea class="form-control" name="bio" placeholder="Short Biography" rows="5"
+                                              required></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Facebook</label>
+                                    <input class="form-control" name="social_facebook" placeholder="Facebook URL"
+                                           type="url">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>LinkedIn</label>
+                                    <input class="form-control" name="social_linkedin" placeholder="LinkedIn URL"
+                                           type="url">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Instagram</label>
+                                    <input class="form-control" name="social_instagram" placeholder="Instagram URL"
+                                           type="url">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>WhatsApp</label>
+                                    <input class="form-control" name="social_whatsapp" placeholder="WhatsApp Number"
+                                           type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>YouTube</label>
+                                    <input class="form-control" name="social_youtube" placeholder="YouTube Channel URL"
+                                           type="url">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Profile Image</label>
+                                    <input class="form-control" name="profile_image" type="file" accept="image/*">
+                                    <div class="form-text">Max Upload Size: 1MB.</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <button class="theme-btn" type="submit">Add Author<i
+                                            class="fas fa-arrow-right-long"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <%- include('partials/footer') %>

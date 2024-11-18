@@ -1,0 +1,74 @@
+    <%- include('partials/header') %>
+    <main class="main">
+        <div class="application py-120">
+            <div class="container">
+                <div class="application-form">
+                    <h3>Add New Department</h3>
+                    <form action="/add-department" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Department Name</label>
+                                    <input class="form-control" name="name" placeholder="Department Name"
+                                           type="text" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Brief Description</label>
+                                    <input class="form-control" name="description" id="description"
+                                           placeholder="Brief Description" type="text" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Additional Information</label>
+                                    <textarea class="form-control" name="addinfo" id="addinfo"
+                                              placeholder="Additional Information"
+                                              type="text" required rows="5"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Display Icon</label>
+                                    <input aria-describedby="photohelp" class="form-control" name="icon"
+                                           type="file" accept="image/*">
+                                    <div class="form-text" id="photohelp">
+                                        Max Upload Size 1MB.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Images</label>
+                                    <input aria-describedby="photohelp" class="form-control" name="images" type="file"
+                                           accept="image/*" multiple>
+                                    <div class="form-text" id="photohelp">
+                                        Max Upload Size 1MB.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Department Documents</label>
+                                    <input aria-describedby="photohelp" class="form-control" name="docs" type="file"
+                                           accept="*/*" multiple>
+                                    <div class="form-text" id="photohelp">
+                                        Max Upload Size 1MB.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <button class="theme-btn" type="submit">Add Department<i
+                                            class="fas fa-arrow-right-long"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+

@@ -1,0 +1,31 @@
+    <%- include('partials/header') %>
+
+    <main class="main">
+        <div class="department-area py-120">
+            <div class="container">
+                <div class="row">
+                    <% departments.forEach(department => { %>
+                        <div class="col-lg-3">
+                            <div class="department-item">
+                                <div class="department-icon">
+                                    <img src="<%= department.icon_url %>" alt="<%= department.name %>">
+                                </div>
+                                <div class="department-info">
+                                    <h4 class="department-title">
+                                        <a href="/department/<%= department.id %>"><%= department.name %></a>
+                                    </h4>
+                                    <p><%= department.description %></p>
+                                    <div class="department-btn">
+                                        <a href="/department/<%= department.id %>">Read More<i
+                                                    class="fas fa-arrow-right-long"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
