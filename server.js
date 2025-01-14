@@ -1,4 +1,3 @@
-// index.ejs.js
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -7,89 +6,116 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 require('dotenv').config();
 
-//Import Routes
-const admissionsRoutes = require('./routes/admissions');
-const authenticationRoutes = require('./routes/authentication');
-const blogRoutes = require('./routes/blog');
-const campusRoutes = require('./routes/campus');
-const contactRoutes = require('./routes/contact');
-const courseRoutes = require('./routes/courses');
-const departmentRoutes = require('./routes/department');
-const homeRoutes = require('./routes/home')
-const pageRoutes = require('./routes/pages')
+// Add initial error logging
+console.log('Starting server initialization...');
 
-const app = express();
-const port = process.env.PORT || 3000;
+try {
+    //Import Routes - Wrap in try-catch to see which route is failing
+    console.log('Loading routes...');
+    const admissionsRoutes = require('./routes/admissions');
+    console.log('Loaded admissions routes');
+    const authenticationRoutes = require('./routes/authentication');
+    console.log('Loaded authentication routes');
+    const blogRoutes = require('./routes/blog');
+    console.log('Loaded blog routes');
+    const campusRoutes = require('./routes/campus');
+    console.log('Loaded campus routes');
+    const contactRoutes = require('./routes/contact');
+    console.log('Loaded contact routes');
+    const courseRoutes = require('./routes/courses');
+    console.log('Loaded course routes');
+    const departmentRoutes = require('./routes/department');
+    console.log('Loaded department routes');
+    const homeRoutes = require('./routes/home');
+    console.log('Loaded home routes');
+    const pageRoutes = require('./routes/pages');
+    console.log('Loaded page routes');
 
-// Middleware
-app.use(morgan('dev')); // HTTP request logger
-app.use(helmet()); // Security middleware
-app.use(cors()); // Enable CORS
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+    const app = express();
+    const port = process.env.PORT || 3001; // Changed to 3001 to avoid conflicts
 
-// Set EJS as the view engine
-app.set('view engine', 'ejs');
+    // Middleware
+    app.use(morgan('dev'));
+    app.use(helmet());
+    app.use(cors());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
 
-// Define the folder to store the views (your dynamic HTML files)
-app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'ejs');
+    app.set('views', path.join(__dirname, 'views'));
+    app.use(express.static(path.join(__dirname, 'public')));
+    app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-// Serve static files (CSS, JS)
-app.use(express.static(path.join(__dirname, 'public')));
+    // API Routes
+    app.use(admissionsRoutes);
+    app.use(authenticationRoutes);
+    app.use(blogRoutes);
+    app.use(campusRoutes);
+    app.use(contactRoutes);
+    app.use(courseRoutes);
+    app.use(departmentRoutes);
+    app.use(homeRoutes);
+    app.use(pageRoutes);
 
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+    app.get('/health', (req, res) => {
+        res.status(200).json({
+            status: 'success',
+            message: 'Server is running',
+            timestamp: new Date()
+        });
+    });
 
-// API Routes
-app.use(admissionsRoutes)
-app.use(authenticationRoutes)
-app.use(blogRoutes)
-app.use(campusRoutes)
-app.use(contactRoutes)
-app.use(courseRoutes)
-app.use(departmentRoutes)
-app.use(homeRoutes)
-app.use(pageRoutes)
+    // Error Handlers
+    app.use((req, res, next) => {
+        res.status(404).json({
+            status: 'error',
+            message: 'Route not found'
+        });
+    });
 
-// Basic test route
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Server is running',
-    timestamp: new Date()
-  });
-});
+    app.use((err, req, res, next) => {
+        console.error('Error encountered:', err);
+        res.status(err.status || 500).json({
+            status: 'error',
+            message: err.message || 'Internal server error',
+            ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+        });
+    });
 
-// 404 handler
-app.use((req, res, next) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'Route not found'
-  });
-});
+    // Modified error handling to keep window open
+    process.on('uncaughtException', (err) => {
+        console.error('CRITICAL ERROR:', err);
+        console.error('Stack trace:', err.stack);
+        console.log('\nPress any key to exit...');
+        require('readline').createInterface({
+            input: process.stdin,
+            output: process.stdout
+        }).question('Press any key to exit...', () => {
+            process.exit(1);
+        });
+    });
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    status: 'error',
-    message: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+    process.on('unhandledRejection', (reason, promise) => {
+        console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+        // Keep the process running
+    });
 
-// Graceful shutdown handler
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Performing graceful shutdown...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
-});
+    // Start server
+    const server = app.listen(port, () => {
+        console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
+        console.log(`Server listening at http://localhost:${port}`);
+    });
 
-// Start server
-const server = app.listen(port, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
-  console.log(`Server listening at http://localhost:${port}`);
-});
+    module.exports = server;
 
-module.exports = server; // Export for testing
+} catch (error) {
+    console.error('STARTUP ERROR:', error);
+    console.error('Stack trace:', error.stack);
+    console.log('\nPress any key to exit...');
+    require('readline').createInterface({
+        input: process.stdin,
+        output: process.stdout
+    }).question('Press any key to exit...', () => {
+        process.exit(1);
+    });
+}

@@ -1,7 +1,7 @@
 // routes/blogRoutes.js
 const express = require('express');
 const router = express.Router();
-const db = require('../../config/db');
+const db = require('../config/db');
 const multer = require('multer');
 const path = require('path');
 
@@ -84,6 +84,95 @@ router.post('/add-category', upload.none(), async (req, res) => {
     } catch (error) {
         console.error('Error inserting category:', error);
         res.status(500).send('Server error');
+    }
+});
+
+// Rendering the add blog form
+router.get('/add-blog', (req, res) => {
+    res.render('add-blog-post', { title: "Add Blog" });
+});
+
+router.post('/add-blog-post', upload.array('images', 5), async (req, res) => {
+    try {
+        const {
+            title,
+            content,
+            author_id,
+            category_id,
+            tags
+        } = req.body;
+
+        // Validate required fields
+        if (!title || !content || !author_id || !category_id) {
+            return res.status(400).send('Required fields are missing');
+        }
+
+        // Process uploaded images
+        const imageUrls = req.files ? req.files.map(file => `/uploads/blog-images/${file.filename}`).join(',') : null;
+
+        // Get current timestamp
+        const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        // Clean and validate tags
+        const cleanedTags = tags ? tags.trim() : null;
+
+        // First, let's log the data we're trying to insert
+        console.log('Inserting data:', {
+            title,
+            content,
+            imageUrls,
+            author_id,
+            category_id,
+            currentTime,
+            cleanedTags
+        });
+
+        // Insert blog post with explicit NULL for tags if empty
+        const [result] = await db.promise().query(`
+            INSERT INTO blog_posts (
+                title,
+                content,
+                images,
+                author_id,
+                category_id,
+                created_at,
+                updated_at,
+                likes_count,
+                comments_count,
+                tags
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            title,
+            content,
+            imageUrls,
+            author_id,
+            category_id,
+            currentTime,
+            currentTime,
+            0, // Initial likes_count
+            0, // Initial comments_count
+            cleanedTags || null  // Use NULL if tags is empty
+        ]);
+
+        res.status(201).send('Blog post added successfully');
+    } catch (error) {
+        // Enhanced error logging
+        console.error('Error details:', {
+            message: error.message,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            sqlState: error.sqlState
+        });
+
+        // Send more specific error message
+        if (error.code === 'ER_INNODB_AUTOEXTEND_SIZE_OUT_OF_RANGE') {
+            res.status(400).send('The data is too large for one or more fields. Please reduce the content size.');
+        } else if (error.sqlMessage && error.sqlMessage.includes('CONSTRAINT')) {
+            res.status(400).send('There was an issue with the data format. Please check the tags format.');
+        } else {
+            res.status(500).send('Server error');
+        }
     }
 });
 
